@@ -1,0 +1,37 @@
+Select DisplayName AS HOSTNAME,'/Orion/images/SubViewIcons/virtualizations02.png' as [_IconFor_HOSTNAME],IPAddress as IPADDRESS, '/Orion/images/Interfaces.png' as [_IconFor_IPADDRESS],ToString(Nodes.Volumes.DisplayName) AS MOUNTPOINT,  '/Orion/images/FixedDisk.gif' as [_IconFor_MOUNTPOINT],
+ToString(Round((Nodes.Volumes.VolumeSize)/1073741824,2)) + ' GB'  AS Capacity,'/Orion/images/FixedDisk.gif' as [_IconFor_Capacity], 
+ToString(Round((Nodes.Volumes.VolumeSpaceAvailable)/1073741824,2)) + ' GB' AS FreeSpace, 
+'/Orion/images/FixedDisk.gif' as [_IconFor_FreeSpace],
+Replace (ToString(Round((Nodes.Volumes.VolumePercentUsed),2)), '0000000000' , '') + ' %'  
+AS Utilization,
+
+CASE
+
+WHEN Nodes.Volumes.VolumePercentUsed < 75  THEN '/Orion/images/ActiveAlerts/InformationalAlert.png'
+WHEN Nodes.Volumes.VolumePercentUsed between 75 and 80 THEN '/Orion/images/ActiveAlerts/Warning.png'
+WHEN Nodes.Volumes.VolumePercentUsed > 80 THEN '/Orion/images/ActiveAlerts/Critical.png'
+
+END AS [_IconFor_Utilization]
+
+
+from  Orion.Nodes as Nodes WHERE Nodes.CustomProperties.NodeGroup like '${CAPTION}' and Nodes.Volumes.VolumePercentUsed > 75  and Nodes.Volumes.DisplayName NOT IN ('Physical Memory', 'Virtual Memory', 'Cached memory', 'Memory buffers','Shared memory','Real memory','System RAM','RAM','/mnt/cdrom')
+union
+(SELECT VirtualMachines.DisplayName as HOSTNAME,'/Orion/images/SubViewIcons/virtualizations02.png' as [_IconFor_HOSTNAME],
+VirtualMachines.IPAddress  as IPADDRESS,'/Orion/images/Interfaces.png' as [_IconFor_IPADDRESS], ToString(VirtualMachines.VirtualVolumes.MountPoint) as MOUNTPOINT,   '/Orion/images/FixedDisk.gif' as [_IconFor_MOUNTPOINT],
+ToString((VirtualMachines.VirtualVolumes.Capacity)/1073741824) + ' GB' as Capacity,'/Orion/images/FixedDisk.gif' as [_IconFor_Capacity], 
+ToString((VirtualMachines.VirtualVolumes.Freespace)/1073741824) + ' GB' as FreeSpace,'/Orion/images/FixedDisk.gif' as [_IconFor_FreeSpace], 
+Replace (ToString(Round((VirtualMachines.VirtualVolumes.SpaceUtilization),2)), '0000000000' , '') + ' %' 
+AS Utilization,
+
+CASE
+
+WHEN VirtualMachines.VirtualVolumes.SpaceUtilization < 75  THEN  '/Orion/images/ActiveAlerts/InformationalAlert.png'
+WHEN VirtualMachines.VirtualVolumes.SpaceUtilization between 75 and 80  THEN  '/Orion/images/ActiveAlerts/Warning.png'
+WHEN VirtualMachines.VirtualVolumes.SpaceUtilization > 80  THEN '/Orion/images/ActiveAlerts/Critical.png'
+
+END AS [_IconFor_Utilization]
+
+
+
+
+from  Orion.VIM.VirtualMachines as VirtualMachines WHERE VirtualMachines.CustomProperties.VMGroup like  '${CAPTION}' and VirtualMachines.VirtualVolumes.SpaceUtilization > 75 and VirtualMachines.DisplayName NOT IN ('Physical Memory', 'Virtual Memory', 'Cached memory', 'Memory buffers','Shared memory','Real memory','System RAM','RAM','/mnt/cdrom'))
