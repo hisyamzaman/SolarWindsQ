@@ -1,0 +1,60 @@
+
+SELECT  
+VirtualMachines.DisplayName as Display_Name, '/Orion/images/SubViewIcons/virtualizations02.png' as [_IconFor_Display_Name],
+VirtualMachines.IPAddress as IP_Address,'/Orion/images/Interfaces.png' as [_IconFor_IP_Address],
+Replace(ToString(Round((VirtualMachines.CPULoad),2)), '-2', '0') + '%' as CPU_Utilization,
+
+ToString((VirtualMachines.MemoryConfigured)/1073741824) + ' GB' as Total_Mem,'/Orion/images/VirtualMemory.gif' as [_IconFor_Total_Mem],
+ToString((VirtualMachines.MemUsageMB)) + ' MB' as Mem_Usage, '/Orion/images/VirtualMemory.gif' as [_IconFor_Mem_Usage],
+ToString(Round((VirtualMachines.MemUsage),2)) + ' %' as Mem_Utilization,
+
+CASE
+
+WHEN VirtualMachines.MemUsage between 0 and 79  THEN '/Orion/images/ActiveAlerts/InformationalAlert.png'
+WHEN VirtualMachines.MemUsage between 80 and 89  THEN '/Orion/images/ActiveAlerts/Warning.png'
+WHEN VirtualMachines.MemUsage between 90 and 100 THEN '/Orion/images/ActiveAlerts/Critical.png'
+
+
+END AS [_IconFor_Mem_Utilization],
+
+CASE
+
+WHEN VirtualMachines.CPULoad between 90 and 100 THEN '/Orion/images/ActiveAlerts/Critical.png'
+WHEN VirtualMachines.CPULoad between 80 and 89 THEN '/Orion/images/ActiveAlerts/Warning.png'
+WHEN VirtualMachines.CPULoad between 0 and 79 THEN '/Orion/images/ActiveAlerts/InformationalAlert.png'
+
+END AS [_IconFor_CPU_Utilization]
+
+
+from Orion.VIM.VirtualMachines as VirtualMachines WHERE VirtualMachines.CustomProperties.VMGroup LIKE '${CAPTION}'
+UNION
+(
+SELECT  
+DisplayName as Display_Name, '/Orion/images/SubViewIcons/virtualizations02.png' as [_IconFor_Display_Name],
+IPAddress as IP_Address,'/Orion/images/Interfaces.png' as [_IconFor_IP_Address],
+Replace(ToString(Round((CPULoad),2)), '-2', '0') + '%' as CPU_Utilization,
+ToString((TotalMemory)/1073741824) + ' GB' as Total_Mem,'/Orion/images/RAMDisk.gif' as [_IconFor_Total_Mem],
+Replace(ToString((MemoryUsed)/1048576), '-1.90735e-006', '0') + ' MB' as Mem_Usage, '/Orion/images/RAMDisk.gif' as [_IconFor_Mem_Usage],
+ToString(Round((PercentMemoryUsed),2)) + ' %' as Mem_Utilization,
+
+CASE
+
+WHEN PercentMemoryUsed between 0 and 79   THEN '/Orion/images/ActiveAlerts/InformationalAlert.png'
+WHEN PercentMemoryUsed between 80 and 89   THEN '/Orion/images/ActiveAlerts/Warning.png'
+WHEN PercentMemoryUsed between 90 and 100 THEN '/Orion/images/ActiveAlerts/Critical.png'
+
+END AS [_IconFor_Mem_Utilization],
+
+
+CASE 
+
+WHEN CPULoad between 90 and 100 THEN '/Orion/images/ActiveAlerts/Critical.png'
+WHEN CPULoad between 80 and 89 THEN '/Orion/images/ActiveAlerts/Critical.png'
+WHEN CPULoad between 0 and 79 THEN '/Orion/images/ActiveAlerts/InformationalAlert.png'
+
+END AS [_IconFor_CPU_Utilization]
+
+
+from Orion.Nodes as Nodes WHERE Nodes.CustomProperties.NodeGroup LIKE '${CAPTION}') 
+
+order by MEM_Utilization DESC;
