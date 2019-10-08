@@ -26,10 +26,10 @@
 - Application
 
 ## Monitoring Dashboard for Virtualization 
--Virtualization Summary 
-- Top Host CPU
-- Top Host Memory
-- Top 10 Datastore 
-- Top 10 VM by Snapshot Disk Usage 
+- Top 10 Host CPU
+- Top 10 Host Memory
+- Top 10 Datastore Utilization
+- Top 10 VM Snapshot by Age Days
+
 	
 
