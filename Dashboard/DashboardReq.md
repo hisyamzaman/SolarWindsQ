@@ -32,4 +32,15 @@
 - Top 10 VM Snapshot by Age Days
 
 	
+## Sample of the Applications
+- JBOSS
+- Apache
+- Java
+- Oracle
+- MSSQL
+- IIS 
+- Window Services
+- Weblogic
+- Tomcat
+
 
